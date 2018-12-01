@@ -1,0 +1,13 @@
+{
+   "background": {
+      "scripts": [ "background.js" ]
+   },
+   "browser_action": {
+      "default_title": "HTTP Headers"
+   },
+   "description": "Quickly view HTTP headers for the current page.",
+   "manifest_version": 2,
+   "name": "HTTP Headers",
+   "permissions": [ "tabs", "*://*/*", "webRequest" ],
+   "version": "1.0.0"
+}
