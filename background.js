@@ -10,8 +10,11 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
     {urls: ["<all_urls>"]},
     ["requestHeaders"]
 );
+
 chrome.tabs.onRemoved.addListener(function(tabId, removeInfo){
-    
+    for(var i=0;i<dict.length;i++){
+        if (dict[i].key === tabId) dict.splice(i,1);
+    }
 }); 
 
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
