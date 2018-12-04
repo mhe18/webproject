@@ -1,5 +1,6 @@
 chrome.runtime.onMessage.addListener(
   function(request, sender) {
+  	console.log(request)
   	if(request.alert == "CORSinject")
       alertString = "Probable Cross-origin resource sharing. Injection in the header\n" ;
     else if(request.alert == "CORSorigin")

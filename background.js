@@ -1,12 +1,13 @@
 dict = [];
 const HEADER_CORS = {
     "accept": "accept",
+    "accept-encoding": "accept-encoding",
     "accept-charset": "accept-charset",
     "access-control-request-headers":"access-control-request-headers",
     "access-control-request-method":"access-control-request-method",
     "accept-language": "accept-language",
     "connection":"connection",
-    "content-length":"conteent-length",
+    "content-length":"content-length",
     "content-language": "content-language",
     "content-type": "content-type",
     "cookie": "cookie",
@@ -39,6 +40,8 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
     		handleWebSocket(details)
         else if (checkSimpleCORS(details))  {
             console.log(details.type);
+            headers = returnHeaders(details)
+            console.log(headers)
             handleSimpleCORS(headers);
         }
         dict.push({ key: details.tabId, value: details.requestHeaders });
@@ -103,7 +106,7 @@ function titleForSimpleCORS(name) {
 
 //Check whether the CORS request is a simple one
 function checkSimpleCORS(details){
-    if (details.method != "HEAD" && details.methond != "GET" && details.method != "POST") {
+    if (details.method != "HEAD" && details.method != "GET" && details.method != "POST") {
         return false;
     }    // Request methond is HEAD, GET or POST
     
@@ -113,13 +116,14 @@ function checkSimpleCORS(details){
     for (let header of _headers) { headers[header.name]= header.value;}
     var headerNames = Object.keys(headers).sort();
     for (let name of headerNames){
-        if (!titleForSimpleCORS(name)) {
-            return false;
-            console.log(name);
-            }
-        } //Request header values are not customized, except for 9 whitelisted headers in HEADER_CORS
-    
+	    if (!titleForSimpleCORS(name)) {
+	    	console.log(name)
+	        return false;
+        }
+    } //Request header values are not customized, except for 9 whitelisted headers in HEADER_CORS
+    console.log(headers.hasOwnProperty('Content-Type'))
     if(headers.hasOwnProperty('Content-Type')){
+    	console.log(headers['Content-Type'])
         if (headers['Content-Type']!= "text/plain" && headers['Content-Type'] != "multipart/form-data" && headers['Content-Type'] != "application/x-form-uri-encoded"){
         return false;
         } //Content-Type header value is one of three specific values
