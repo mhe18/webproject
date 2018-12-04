@@ -32,9 +32,7 @@ const HEADER_CORS = {
 }
 
 //whitelist for cross origin website
-const WHITE_LIST = {
-    "google","twitter","youtube","facebook"
-}
+const WHITE_LIST = ["google","twitter","youtube","facebook"]
 
 chrome.webRequest.onBeforeSendHeaders.addListener(
     function(details) {	
