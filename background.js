@@ -13,9 +13,7 @@ const HEADER_CORS = {
 
 chrome.webRequest.onBeforeSendHeaders.addListener(
     function(details) {	
-        var headers=returnHeaders(details);
-        if (headers.hasOwnProperty('Upgrade') && headers['Upgrade']=='websocket')
-    	//if (headers.type == "websocket")
+    	if (details.type == "websocket")
     		handleWebSocket(details)
         else if (checkSimpleCORS(details))  {
             console.log(details.type);
@@ -64,11 +62,11 @@ function handleWebSocket(details){
 		urlDomain = extractDomainHttp(details.url)
 	else if (details.url.indexOf("ws://") != -1 || details.url.indexOf("wss://") != -1)
 		urlDomain = extractDomainWss(details.url)
-	
-	initiatorDomain = getDomainName(initiatorDomain)
-	urlDomain = getDomainName(urlDomain)
 
-	if (initiatorDomain != urlDomain)  sendWrong("ws_hijacking");
+	if (initiatorDomain != urlDomain) 
+	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+	  		chrome.tabs.sendMessage(tabs[0].id, {initiatorDomain: initiatorDomain, urlDomain: urlDomain})
+	})
 }
 
 function titleForSimpleCORS(name) {
@@ -118,11 +116,11 @@ function handleSimpleCORS(headers){
 }
 
 function extractDomainHttp(url){
-	return String(url.match(/^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)/g))
+	return getDomainName(String(url.match(/^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)/g)))
 }
 
 function extractDomainWss(url){
-	return String(url.match(/^(?:wss?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)/g))
+	return getDomainName(String(url.match(/^(?:wss?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)/g)))
 }
 
 function getDomainName(url){
