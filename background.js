@@ -1,21 +1,45 @@
 dict = [];
 const HEADER_CORS = {
     "accept": "accept",
+    "accept-charset": "accept-charset",
+    "access-control-request-headers":"access-control-request-headers",
+    "access-control-request-method":"access-control-request-method",
     "accept-language": "accept-language",
+    "connection":"connection",
+    "content-length":"conteent-length",
     "content-language": "content-language",
     "content-type": "content-type",
+    "cookie": "cookie",
+    "cookie2": "cookie2",
+    "date":"date",
+    "dnt":"dnt",
     "drp": "drp",
     "downlink": "downlink",
+    "expect":"expect",
+    "host":"host",
+    "keep-alive":"kepp-alive",
+    "referer":"referer",
+    "te":"te",
+    "trailer":"trailer",
+    "transfer-encoding":"transfer-encoding",
+    "upgrade":"upgrade",
     "save-data": "save-data",
     "viewport-width": "viweport-width",
-    "width": "width"
+    "via":"via",
+    "width": "width",
+    "user-agent": "user-agent",
+    "origin": "origin"
+}
+
+const WHITE_LIST = {
+    "google.com","twitter.com","youtube.com","facebook.com"
 }
 
 chrome.webRequest.onBeforeSendHeaders.addListener(
     function(details) {	
         var headers=returnHeaders(details);
-        if (headers.hasOwnProperty('Upgrade') && headers['Upgrade']=='websocket')
-    	//if (headers.type == "websocket")
+        //if (headers.hasOwnProperty('Upgrade') && headers['Upgrade']=='websocket')
+    	if (headers.type == "websocket")
     		handleWebSocket(details)
         else if (checkSimpleCORS(details))  {
             console.log(details.type);
@@ -46,7 +70,7 @@ function sendWrong(errors){
 		})
 }
 
-function returnHeaders(datails){
+function returnHeaders(details){
     const type = details.hasOwnProperty('requestHeaders') ? 'request' : 'response';
     var _headers = details[`${type}Headers`];
     var headers={};
@@ -115,6 +139,9 @@ function handleSimpleCORS(headers){
             if(headers[header].match(regex) != null) sendWrong('CORSattack');
         } //restrict the values of Accept, Accept-Language and Content-Language
     }
+    
+    for (let origin of WHITE_LIST)
+    
 }
 
 function extractDomainHttp(url){
