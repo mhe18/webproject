@@ -63,7 +63,7 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
 //send the wrong message
 function sendWrong(errors){
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-	  		chrome.tabs.sendMessage(tabs[0].id, {alert: "true",errors:errors})
+	  		chrome.tabs.sendMessage(tabs[0].id, {alert: "http", errors:errors})
 		})
 }
 
@@ -88,7 +88,7 @@ function handleWebSocket(details){
 
 	if (initiatorDomain != urlDomain) 
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-	  		chrome.tabs.sendMessage(tabs[0].id, {initiatorDomain: initiatorDomain, urlDomain: urlDomain})
+	  	chrome.tabs.sendMessage(tabs[0].id, {alert: "wss", initiatorDomain: initiatorDomain, urlDomain: urlDomain})
 	})
 }
 
