@@ -24,14 +24,13 @@ const HEADER_CORS = {
     "transfer-encoding":"transfer-encoding",
     "upgrade":"upgrade",
     "save-data": "save-data",
-    "viewport-width": "viweport-width",
+    "viewport-width": "viewport-width",
     "via":"via",
     "width": "width",
     "user-agent": "user-agent",
     "origin": "origin"
 }
 
-//whitelist for cross origin website
 const WHITE_LIST = ["google","twitter","youtube","facebook"]
 
 chrome.webRequest.onBeforeSendHeaders.addListener(
@@ -40,7 +39,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
     		handleWebSocket(details)
         else if (checkSimpleCORS(details))  {
             console.log(details.type);
-            handleSimpleCORS(headers);//check the CORS header
+            handleSimpleCORS(headers);
         }
         dict.push({ key: details.tabId, value: details.requestHeaders });
         //console.log(dict)
@@ -63,11 +62,11 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
 //send the wrong message
 function sendWrong(errors){
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-	  		chrome.tabs.sendMessage(tabs[0].id, {alert: "http", errors:errors})
+	  		chrome.tabs.sendMessage(tabs[0].id, {alert: errors})
 		})
 }
 
-function returnHeaders(details){
+function returnHeaders(datails){
     const type = details.hasOwnProperty('requestHeaders') ? 'request' : 'response';
     var _headers = details[`${type}Headers`];
     var headers={};
