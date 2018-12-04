@@ -31,19 +31,18 @@ const HEADER_CORS = {
     "origin": "origin"
 }
 
+//whitelist for cross origin website
 const WHITE_LIST = {
-    "google.com","twitter.com","youtube.com","facebook.com"
+    "google","twitter","youtube","facebook"
 }
 
 chrome.webRequest.onBeforeSendHeaders.addListener(
     function(details) {	
-        var headers=returnHeaders(details);
-        //if (headers.hasOwnProperty('Upgrade') && headers['Upgrade']=='websocket')
-    	if (headers.type == "websocket")
+    	if (details.type == "websocket")
     		handleWebSocket(details)
         else if (checkSimpleCORS(details))  {
             console.log(details.type);
-            handleSimpleCORS(headers);
+            handleSimpleCORS(headers);//check the CORS header
         }
         dict.push({ key: details.tabId, value: details.requestHeaders });
         //console.log(dict)
@@ -88,11 +87,11 @@ function handleWebSocket(details){
 		urlDomain = extractDomainHttp(details.url)
 	else if (details.url.indexOf("ws://") != -1 || details.url.indexOf("wss://") != -1)
 		urlDomain = extractDomainWss(details.url)
-	
-	initiatorDomain = getDomainName(initiatorDomain)
-	urlDomain = getDomainName(urlDomain)
 
-	if (initiatorDomain != urlDomain)  sendWrong("ws_hijacking");
+	if (initiatorDomain != urlDomain) 
+	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+	  		chrome.tabs.sendMessage(tabs[0].id, {initiatorDomain: initiatorDomain, urlDomain: urlDomain})
+	})
 }
 
 function titleForSimpleCORS(name) {
@@ -140,16 +139,17 @@ function handleSimpleCORS(headers){
         } //restrict the values of Accept, Accept-Language and Content-Language
     }
     
-    for (let origin of WHITE_LIST)
-    
+    var origin=extractDomainHttp(headers['Origin']);
+    if (!WHITE_LIST.contains(origin)) sendWrong('CORSorigin');
+    //check whether the origin is trusted
 }
 
 function extractDomainHttp(url){
-	return String(url.match(/^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)/g))
+	return getDomainName(String(url.match(/^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)/g)))
 }
 
 function extractDomainWss(url){
-	return String(url.match(/^(?:wss?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)/g))
+	return getDomainName(String(url.match(/^(?:wss?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)/g)))
 }
 
 function getDomainName(url){
